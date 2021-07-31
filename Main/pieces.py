@@ -152,7 +152,7 @@ class Pawn(Piece):
                 pass
         return valid_attacks
 
-#our new stuff
+#our new stuff is below here
 
 class Cardinal(Piece):
     def __init__(self, colour):
