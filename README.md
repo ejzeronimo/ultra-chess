@@ -1,0 +1,2 @@
+# UltraChess
+Chess but ULTRA
