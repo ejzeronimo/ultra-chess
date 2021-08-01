@@ -1,6 +1,9 @@
 class Piece:
     images = ['white_king', 'white_queen', 'white_rook', 'white_bishop', 'white_knight', 'white_pawn', 'black_king','black_queen', 'black_rook', 'black_bishop', 'black_knight', 'black_pawn', 'black_cardinal', 'white_angel', None, 'black_scout', 'white_cardinal', 'black_angel', None, 'white_scout']
 
+    #https://www.w3schools.com/python/trypython.asp?filename=demo_dictionary
+    #implement vector & displacement into moveset
+    #unbounded should be labeled as repeating
     def __init__(self, colour, name, unbounded=True):
         self.colour = colour
         self.name = name
@@ -96,7 +99,7 @@ class King(Piece):
             except IndexError:
                 continue
         return False
-        
+
     #used to castle the king
     def castle(self, board, x, y):
         moves = []
@@ -165,10 +168,18 @@ class Pawn(Piece):
 
 #JACKSON THESE THREE
 
+class Scout(Piece):
+    def __init__(self, colour):
+        self.moveset = {(0, y) for y in range(-1, 2)}
+        super().__init__(colour, 'scout')
+
+        #needs rest of moves
+
 class Cardinal(Piece):
     def __init__(self, colour):
-        self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
-        super().__init__(colour, 'cardinal')
+        #self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
+        self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 and y != 0}
+        super().__init__(colour, 'cardinal', unbounded=False)
 
 
 class Angel(Piece):
@@ -176,8 +187,3 @@ class Angel(Piece):
         self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
         super().__init__(colour, 'angel')
 
-
-class Scout(Piece):
-    def __init__(self, colour):
-        self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
-        super().__init__(colour, 'scout')
