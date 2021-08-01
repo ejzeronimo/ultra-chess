@@ -143,11 +143,11 @@ class King(Piece):
             #add the diagonal array to the kings pos then if this unit is at that point
             #{(-1,-1),(-1,1),(1,1),(1,-1)}
 
-            if 0 in move and (square.name == 'cardinal' and location[1] - coords[1]) or 0 not in move and ((square.name == 'scout' and location[1]+ )):
+            if 0 not in move and ((square.name == 'scout' and abs(location[1] - coords[1]) == 1 )):
                 return True
 
             if 0 not in move and  (square.name == 'scout'):
-                print(location,square.additional_moves(board, coords[1], coords[0]))
+                print(location,({location[1] - coords[1],location[0] - coords[0]} in {(-1,-1),(-1,1),(1,1),(1,-1)}))
             
         for x, y in {(x, y) for x in range(-2, 3) for y in range(-2, 3) if x != 0 and y != 0 and abs(x) != abs(y)}:
             try:
@@ -227,8 +227,7 @@ class Pawn(Piece):
                 pass
         return valid_attacks
 
-#JACKSON THESE THREE
-
+#scout OK
 class Scout(Piece):
     def __init__(self, colour):
         self.moveset = {(0,-1,'vector'),(0,1,'vector')}
