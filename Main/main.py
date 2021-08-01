@@ -135,7 +135,7 @@ def draw_text(screen, font, turn, colour, check, playing, promotion):
         text_rect.center = [2*offsetX + int(squareUnit * 12),offsetY + int(squareUnit * 4.5)]
         font.render_to(screen, text_rect, f'{turn} wins!'.capitalize(), counter_colour,size = int(squareUnit/3))
     #promotion chooser text
-    promote_dict = {'queen': 9813, 'rook': 9814, 'bishop': 9815, 'knight': 9816}
+    promote_dict = {'queen': 9813, 'rook': 9814, 'bishop': 9815, 'knight': 9816, 'scout': 9831, 'cardinal': 9828, 'angel': 9825}
     text_rect = font.get_rect(f'Promote: {chr(promote_dict[promotion])}', size = int(squareUnit/3))
     text_rect.center = [2*offsetX + int(squareUnit * 15),offsetY + int(squareUnit * 4.5)]
     font.render_to(screen, text_rect, f'Promote: {chr(promote_dict[promotion])}', counter_colour,size = int(squareUnit/3))
@@ -188,20 +188,18 @@ def draw_captures(screen, font, captures):
         text_rect.center = [2*offsetX + int(squareUnit * 11.5) + (squareUnit * (e - offsetSudoX)),offsetY + offsetSudoY + int(6.5 * squareUnit)]
         font.render_to(screen, text_rect, piece.image, WHITE,size = squareUnit)
 
-
-
-#FIX THIS
+#this sets the states of all peices as they move
 def move_piece(board, target, kings, origin, destination, captures, promotion):
+    #add to the turn number when white goes
     global turn_number
     if target.colour == 'white':
         turn_number += 1
 
-    #piece move conditions
+    #en passant move condition
     for row in board:
         for piece in row:
             if piece and piece.name == 'pawn' and piece.en_passant:
                 piece.en_passant = False
-
 
     promoting = False
 
@@ -214,20 +212,19 @@ def move_piece(board, target, kings, origin, destination, captures, promotion):
         if origin[0] != destination[0] and not board[destination[1]][destination[0]]:
             captures.append(board[destination[1] - target.direction][destination[0]])
             board[destination[1] - target.direction][destination[0]] = None
-        if destination[1] == (0 if target.colour == 'white' else 7):
+        if destination[1] == (0 if target.colour == 'white' else 9):
             promoting = True
-            piece_dict = {'queen': pieces.Queen(target.colour), 'knight': pieces.Knight(target.colour),
-                          'rook': pieces.Rook(target.colour), 'bishop': pieces.Bishop(target.colour)}
+            piece_dict = {'queen': pieces.Queen(target.colour), 'knight': pieces.Knight(target.colour), 'rook': pieces.Rook(target.colour), 'bishop': pieces.Bishop(target.colour), 'angel': pieces.Angel(target.colour), 'scout': pieces.Scout(target.colour), 'cardinal': pieces.Cardinal(target.colour)}
 
-
-    #all the rules for moving kings
+    #king castle
     if target.name == 'king':
+        #set destination as new position
         kings[int(target.colour == "black")] = destination
         if target.castle_rights:
             target.castle_rights = False
         if destination[0] - origin[0] == 2:
-            board[target.back_rank][5] = board[target.back_rank][7]
-            board[target.back_rank][7] = None
+            board[target.back_rank][5] = board[target.back_rank][9]
+            board[target.back_rank][9] = None
         if origin[0] - destination[0] == 2:
             board[target.back_rank][3] = board[target.back_rank][0]
             board[target.back_rank][0] = None
@@ -240,7 +237,7 @@ def move_piece(board, target, kings, origin, destination, captures, promotion):
     if board[destination[1]][destination[0]]:
         captures.append(board[destination[1]][destination[0]])
 
-    #move piece
+    #move piece or promote
     if not promoting:
         board[destination[1]][destination[0]] = target
     else:
@@ -251,9 +248,6 @@ def move_piece(board, target, kings, origin, destination, captures, promotion):
     enemy_king = kings[int(target.colour == "white")]
     check = board[enemy_king[1]][enemy_king[0]].in_check(board, enemy_king)
     return board, captures, kings, check
-
-
-
 
 
 
@@ -350,6 +344,12 @@ def main():
                     promotion = 'rook'
                 if event.key == pg.K_4:
                     promotion = 'bishop'
+                if event.key == pg.K_5:
+                    promotion = 'scout'
+                if event.key == pg.K_6:
+                    promotion = 'cardinal'
+                if event.key == pg.K_7:
+                    promotion = 'angel'
             #of the user clicks the close button
             if event.type == pg.QUIT:
                 pg.quit()
