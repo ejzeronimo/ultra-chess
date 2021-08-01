@@ -73,7 +73,7 @@ class Piece:
                     #if its a vector
                     if moveType == 'vector':
                         #if your not a knight/pawn or your a double moving pawn the you get to multiply out to make a line
-                        while self.name != 'pawn' and self.name != 'scout' or (self.name == 'pawn' and self.double_move):
+                        while self.name != 'pawn' and self.name != 'scout':
                             #if we are in check and the king would still be in check if we moved skip
                             if check and board[king[1]][king[0]].in_check(board, king_pos, moved_from=location, moved_to=coords):
                                 continue
@@ -106,6 +106,9 @@ class Piece:
                     #if its a displacement
                     else:
                         legal_moves.append(coords)
+                        if (self.name == 'pawn' and self.double_move):
+                            legal_moves.append((coords[0],coords[1] + self.direction))
+                            self.double_move = False
             except IndexError:
                 continue
         #if the king is NOT in check and can still castle
