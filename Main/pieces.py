@@ -1,5 +1,5 @@
 class Piece:
-    images = ['white_king', 'white_queen', 'white_rook', 'white_bishop', 'white_knight', 'white_pawn', 'black_king','black_queen', 'black_rook', 'black_bishop', 'black_knight', 'black_pawn', 'white_angel', 'white_cardinal', 'black_angel', 'black_cardinal']
+    images = ['white_king', 'white_queen', 'white_rook', 'white_bishop', 'white_knight', 'white_pawn', 'black_king','black_queen', 'black_rook', 'black_bishop', 'black_knight', 'black_pawn', 'white_angel', 'white_cardinal', 'white_scout', 'black_angel', 'black_cardinal', 'black_scout']
 
     def __init__(self, colour, name, img_adjust=(50, 50), unbounded=True):
         self.colour = colour
@@ -31,11 +31,9 @@ class Piece:
                     while self.unbounded or self.name == 'pawn' and self.double_move:
                         coords = coords[0] + x2, coords[1] + y2
                         square = board[coords[1]][coords[0]]
-                        if check and board[king[1]][king[0]].in_check(board, king_pos, moved_from=location,
-                                                                      moved_to=coords):
+                        if check and board[king[1]][king[0]].in_check(board, king_pos, moved_from=location, moved_to=coords):
                             continue
-                        if all(i >= 0 for i in coords) and self.name != 'pawn' and (square is None or square and
-                                                                                    square.colour != self.colour) or self.name == 'pawn' and (
+                        if all(i >= 0 for i in coords) and self.name != 'pawn' and (square is None or square and square.colour != self.colour) or self.name == 'pawn' and (
                                 x2 == 0 and square is None):
                             legal_moves.append(coords)
                         elif not check:
@@ -60,10 +58,9 @@ class King(Piece):
         for move in self.moveset:
             coords = location
             square = board[coords[1]][coords[0]]
-            while (coords != moved_to or location == moved_to) and (
-                    coords == location or coords == moved_from or square is None):
+            while (coords != moved_to or location == moved_to) and (coords == location or coords == moved_from or square is None):
                 try:
-                    if any(i < 0 or i > 7 for i in (coords[0] + move[0], coords[1] + move[1])):
+                    if any(i < 0 or i > 9 for i in (coords[0] + move[0], coords[1] + move[1])):
                         break
                     coords = coords[0] + move[0], coords[1] + move[1]
                     square = board[coords[1]][coords[0]]
@@ -71,9 +68,7 @@ class King(Piece):
                     break
             if square is None or square.colour == self.colour or coords == moved_to:
                 continue
-            if 0 in move and (square.name == 'rook' or square.name == 'queen') or 0 not in move and (
-                    square.name == 'bishop' or square.name == 'queen' or (square.name == 'pawn' and
-                                                                          location[1] - coords[1] == square.direction)):
+            if 0 in move and (square.name == 'rook' or square.name == 'queen') or 0 not in move and (square.name == 'bishop' or square.name == 'queen' or (square.name == 'pawn' and location[1] - coords[1] == square.direction)):
                 return True
         for x, y in {(x, y) for x in range(-2, 3) for y in range(-2, 3) if x != 0 and y != 0 and abs(x) != abs(y)}:
             try:
@@ -164,3 +159,9 @@ class Angel(Piece):
     def __init__(self, colour):
         self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
         super().__init__(colour, 'angel', img_adjust=(47, 50))
+
+
+class Scout(Piece):
+    def __init__(self, colour):
+        self.moveset = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
+        super().__init__(colour, 'scout', img_adjust=(47, 50))
